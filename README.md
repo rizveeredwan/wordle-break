@@ -1,5 +1,5 @@
 # Wordle Breaker
-Not much Fancy but gets the work done. Slight raw and interactive, 
+Not much Fancy but gets the work done. Slight raw and interactive, Will show you suggestions for your next move, 
 ```buildoutcfg
 ## Input format and conditions 
 1. ith possible character(C), its guarantee of occurring there(P)
