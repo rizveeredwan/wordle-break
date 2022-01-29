@@ -51,7 +51,7 @@ def wordle_next_level_search(maps, domain_knowledge, invalid_characters):
             # invalid character presence issue
             invalid_character_presence = False
             for i in range(0, len(key)):
-                if invalid_characters.get(key[i]) is not None:
+                if key[i] in invalid_characters[i]:
                     invalid_character_presence = True
                     break
             if invalid_character_presence is True:
@@ -96,7 +96,8 @@ def get_information(input_string, maps,  domain_knowledge, invalid_characters):
             if input_string[i+1] == '1':
                 maps[int(floor(i/2))] = input_string[i]
             if input_string[i + 1] == '2':
-                invalid_characters[input_string[i][0]] = True
+                if input_string[i] not in invalid_characters[int(floor(i/2))]:
+                    invalid_characters[int(floor(i/2))].append(input_string[i])
     return domain_knowledge, maps, invalid_characters
 
 
@@ -123,7 +124,7 @@ def input_validation(input_string):
 
 def process():
     domain_knowledge={}
-    invalid_characters={}
+    invalid_characters=[[], [], [], [], []]
     maps = [0, 0, 0, 0, 0]
     try:
         while True:
