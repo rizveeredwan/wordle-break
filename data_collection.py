@@ -21,7 +21,7 @@ def write_in_file(file_name):
 
 def collect_data(file_name):
     url = 'https://word.tips/five-letter-words/'
-    for i in range(1, 100):
+    for i in range(270, 500):
         url = 'https://v3.wordfinderapi.com/api/search?page_size=100&page_token={}&length=5&dictionary=wwf'.format(
             str(i))
         try:
