@@ -1,4 +1,4 @@
-# Game Helpers
+# Wordle-Nerdle Solver
 
 ## Wordle Helper
 Not much Fancy but gets the work done. Slight raw and interactive, Will show you suggestions for your next move,
@@ -42,17 +42,17 @@ Not much Fancy but gets the work done. Slight raw and interactive, Will show you
 
 Ex: 5162-14102=11162:
 - 5 will occur in 1st position
-- 6 will never occur in this solution 
+- 6 will never occur in this solution
 - '-' will occur in 3rd position
-- 4 will occur in 4th position 
-- 0 will never occur in this solution 
-- '=' will occur in 6th position 
+- 4 will occur in 4th position
+- 0 will never occur in this solution
+- '=' will occur in 6th position
 - 1 will occur in 7th position
 - 6 will never occur in this solution
 ```
 ### Solution Logic
 ```buildoutcfg
-- Uses backtrack generation 
+- Uses backtrack generation
 - Postfix conversion, mathematical string evaluation
 - Simple Constraint matching with positional occur/maps, will occur somewhere/domain knowledge and will never occur/invalid characters
 ```
