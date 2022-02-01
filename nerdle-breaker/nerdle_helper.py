@@ -283,12 +283,24 @@ class NerdleHelper:
                             W.write("{} {} {} {}\n".format(keys, list(domain_knowledge.keys()), domain_knowledge, flag))
                             # domain knowledge satisfied
                             flag = True
+                            applied_domain_knowledge = {}
                             for l in range(0, len(gen_string)):
+                                if maps[l] is not None:
+                                    continue
+                                if domain_knowledge.get(gen_string[l]) is not None:
+                                    if applied_domain_knowledge.get(gen_string[l]) is None:
+                                        applied_domain_knowledge[gen_string[l]] = l
+                                        continue
+                                if invalid_characters.get(gen_string[l]) is not None:
+                                    flag = False
+                                    break
+                                """
                                 if maps[l] is not None or domain_knowledge.get(gen_string[l]) is not None:
                                     continue
                                 if invalid_characters.get(gen_string[l]) is not None:
                                     flag = False
                                     break
+                                """
                             if flag is False:
                                 continue
                             else:
