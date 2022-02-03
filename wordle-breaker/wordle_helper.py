@@ -59,6 +59,7 @@ def wordle_next_level_search(maps, domain_knowledge, invalid_characters):
             if flag is False:
                 # domain knowledge absence
                 continue
+            # print("CAME ", key, domain_knowledge, maps,invalid_characters)
             flag=True
             for i in range(0, len(maps)):
                 if maps[i] != 0:
@@ -72,10 +73,15 @@ def wordle_next_level_search(maps, domain_knowledge, invalid_characters):
                 continue
             # invalid character presence issue
             invalid_character_presence = False
+            apply_domain_knowledge = {}
             for i in range(0, len(key)):
                 if key[i] == maps[i]:
                     # valid positional mapping
                     continue
+                if domain_knowledge.get(key[i]) is not None:
+                    if apply_domain_knowledge.get(key[i]) is None:
+                        apply_domain_knowledge[key[i]] = i
+                        continue
                 if invalid_characters.get(key[i]) is not None:
                     invalid_character_presence = True
                     break
@@ -94,17 +100,18 @@ def handler(signum, frame):
 def get_information(input_string, maps,  domain_knowledge, invalid_characters):
     for i in range(0, len(input_string), 2):
         print(input_string[i], "yes")
-        if input_string[i][0] == '0':
+        if input_string[i] == '0':
             continue
         else:
-            if input_string[i + 1] in ['0', '1']:
-                if domain_knowledge.get(input_string[i][0]) is None:
-                    domain_knowledge[input_string[i][0]] = 0
-                domain_knowledge[input_string[i][0]] = 1
             if input_string[i+1] == '1':
-                maps[int(floor(i/2))] = input_string[i]
-            if input_string[i + 1] == '2':
-                # invalid characters in remaining places
+                maps[int(floor(i / 2))] = input_string[i]
+                if domain_knowledge.get(input_string[i]) is not None:
+                    # requirement chilo, filled up
+                    domain_knowledge[input_string[i]] = 0
+                    del domain_knowledge[input_string[i]]
+            elif input_string[i+1] == '0':
+                domain_knowledge[input_string[i]] = 1
+            elif input_string[i+1] == '2':
                 invalid_characters[input_string[i]] = True
     return domain_knowledge, maps, invalid_characters
 
