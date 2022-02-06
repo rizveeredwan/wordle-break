@@ -32,6 +32,28 @@ class NerdleHelper:
                         new_list[-1] = new_list[-1] * 10 + _list[i]
         return new_list
 
+    def absurd_string_detection(self, _list):
+        _stack = []
+        for i in range(0, len(_list)):
+            if len(_stack) == 0:
+                _stack.append(_list[i])
+            else:
+                if _stack[-1] in ['/', '*', '+', '-', '=']:
+                    _stack.append(_list[i])
+                else:
+                    if _list[i] in ['/', '*', '+', '-', '=']:
+                        _stack.append(_list[i])
+                    else:
+                        _stack[-1] = _stack[-1] * 10 + _list[i]
+
+        _str = ""
+        for i in range(0, len(_stack)):
+            _str = _str + str(_stack[i])
+        # print("_stack ", _stack, len(_str), len(_list))
+        if len(_str) != len(_list):
+            return False
+        return True
+
     def postfix_generation(self, maths):
         _stack = []
         postfix = []
@@ -222,6 +244,8 @@ class NerdleHelper:
         lt_cnt, rt_cnt = 0, 0
         for j in range(0, len(left_side_possibilities)):
             try:
+                if self.absurd_string_detection(_list=left_side_possibilities[j]) is False:
+                    continue
                 maths = self.generate_number(_list=left_side_possibilities[j])
                 pf = self.postfix_generation(maths=maths)
                 ev = self.evaluation(postfix=pf)
@@ -237,6 +261,8 @@ class NerdleHelper:
                 print(e)
         right_dict = {}
         for j in range(0, len(right_side_possibilities)):
+            if self.absurd_string_detection(_list=right_side_possibilities[j]) is False:
+                continue
             try:
                 maths = self.generate_number(_list=right_side_possibilities[j])
                 pf = self.postfix_generation(maths=maths)
@@ -304,6 +330,10 @@ class NerdleHelper:
                             if flag is False:
                                 continue
                             else:
+                                #print("gen string ", gen_string)
+                                if self.absurd_string_detection(_list=gen_string) is False:
+                                    #print("YES")
+                                    continue
                                 possibilities.append([])
                                 for l in range(0, len(gen_string)):
                                     possibilities[-1].append(gen_string[l])
