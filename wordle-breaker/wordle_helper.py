@@ -44,8 +44,10 @@ def return_character_count(word):
     return d
 
 
-def wordle_next_level_search(maps, domain_knowledge, invalid_characters):
+def wordle_next_level_search(maps, domain_knowledge, invalid_characters, last_used_domain_knowledge):
     possibles = []
+    domain_knowledge_keys = list(domain_knowledge.keys())
+    domain_knowledge_keys.sort()
     try:
         for key in tr.dict:
             # check domain knowledge
@@ -74,19 +76,29 @@ def wordle_next_level_search(maps, domain_knowledge, invalid_characters):
             # invalid character presence issue
             invalid_character_presence = False
             apply_domain_knowledge = {}
+            dom_keys = []
             for i in range(0, len(key)):
                 if key[i] == maps[i]:
                     # valid positional mapping
                     continue
                 if domain_knowledge.get(key[i]) is not None:
                     if apply_domain_knowledge.get(key[i]) is None:
+                        if last_used_domain_knowledge.get(key[i]) is not None and i in last_used_domain_knowledge[key[i]]:
+                            continue
                         apply_domain_knowledge[key[i]] = i
+                        dom_keys.append(key[i])
                         continue
                 if invalid_characters.get(key[i]) is not None:
                     invalid_character_presence = True
                     break
             if invalid_character_presence is True:
                 continue
+            dom_keys.sort()
+            print(domain_knowledge_keys, dom_keys, domain_knowledge_keys == dom_keys)
+            if len(domain_knowledge_keys)>0 and domain_knowledge_keys != dom_keys:
+                continue
+            print(key, domain_knowledge, last_used_domain_knowledge, apply_domain_knowledge)
+            print(dom_keys, domain_knowledge_keys)
             possibles.append(key)
     except Exception as e:
         print(e)
@@ -97,7 +109,7 @@ def handler(signum, frame):
     exit()
 
 
-def get_information(input_string, maps,  domain_knowledge, invalid_characters):
+def get_information(input_string, maps,  domain_knowledge, invalid_characters, last_used_domain_knowledge):
     for i in range(0, len(input_string), 2):
         print(input_string[i], "yes")
         if input_string[i] == '0':
@@ -109,11 +121,16 @@ def get_information(input_string, maps,  domain_knowledge, invalid_characters):
                     # requirement chilo, filled up
                     domain_knowledge[input_string[i]] = 0
                     del domain_knowledge[input_string[i]]
+                    del last_used_domain_knowledge[input_string[i]]
             elif input_string[i+1] == '0':
                 domain_knowledge[input_string[i]] = 1
+                if last_used_domain_knowledge.get(input_string[i]) is None:
+                    last_used_domain_knowledge[input_string[i]] = []
+                if int(floor(i / 2)) not in last_used_domain_knowledge[input_string[i]]:
+                    last_used_domain_knowledge[input_string[i]].append(int(floor(i / 2)))
             elif input_string[i+1] == '2':
                 invalid_characters[input_string[i]] = True
-    return domain_knowledge, maps, invalid_characters
+    return domain_knowledge, maps, invalid_characters, last_used_domain_knowledge
 
 
 def input_validation(input_string):
@@ -141,6 +158,7 @@ def process():
     domain_knowledge={}
     invalid_characters={}
     maps = [0, 0, 0, 0, 0]
+    last_used_domain_knowledge = {}
     try:
         while True:
             print("Input will always be 10 characters: ith possible character(C), its guarantee of occurring there(P)")
@@ -154,9 +172,9 @@ def process():
             if input_validation(input_string) is False:
                 print("input error ")
                 continue
-            domain_knowledge, maps, invalid_characters = get_information(input_string, maps, domain_knowledge, invalid_characters)
-            print(domain_knowledge, maps, invalid_characters)
-            possibles = wordle_next_level_search(maps, domain_knowledge, invalid_characters)
+            domain_knowledge, maps, invalid_characters, last_used_domain_knowledge = get_information(input_string, maps, domain_knowledge, invalid_characters, last_used_domain_knowledge)
+            print(domain_knowledge, maps, invalid_characters, last_used_domain_knowledge)
+            possibles = wordle_next_level_search(maps, domain_knowledge, invalid_characters, last_used_domain_knowledge)
             print(len(possibles))
             if len(possibles) > 0:
                 idx = random.randint(0, len(possibles)-1)
