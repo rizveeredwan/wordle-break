@@ -191,7 +191,30 @@ class NerdleHelper:
                 curr_generations.pop()
             pass
 
-    def string_generation(self, maps, domain_knowledge, invalid_characters):
+    def sort_mix_list(self, _list):
+        for i in range(0, len(_list)):
+            best_idx = i
+            best_value = _list[i]
+            if type(_list[i]) is not int:
+                best_value = ord(_list[i])
+            for j in range(i+1, len(_list)):
+                com_value = _list[j]
+                if type(_list[j]) is not int:
+                    com_value = ord(_list[j])
+                if com_value < best_value:
+                    best_value = com_value
+                    best_idx = j
+            temp = _list[i]
+            _list[i] = _list[best_idx]
+            _list[best_idx] = temp
+        return
+
+    def string_generation(self, maps, domain_knowledge, invalid_characters, last_used_domain_knowledge):
+        print("YESSS")
+        domain_knowledge_keys = list(domain_knowledge.keys())
+        self.sort_mix_list(_list=domain_knowledge_keys)
+        print("YESSS 1")
+        print("domain_knowledge_keys ",domain_knowledge_keys)
         characters = []
         for i in range(0, 10):
             characters.append(0)
@@ -310,23 +333,20 @@ class NerdleHelper:
                             # domain knowledge satisfied
                             flag = True
                             applied_domain_knowledge = {}
+                            dom_keys = []
                             for l in range(0, len(gen_string)):
                                 if maps[l] is not None:
                                     continue
                                 if domain_knowledge.get(gen_string[l]) is not None:
                                     if applied_domain_knowledge.get(gen_string[l]) is None:
+                                        if last_used_domain_knowledge.get(gen_string[l]) is not None and l in last_used_domain_knowledge[gen_string[l]]:
+                                            continue
                                         applied_domain_knowledge[gen_string[l]] = l
+                                        dom_keys.append(gen_string[l])
                                         continue
                                 if invalid_characters.get(gen_string[l]) is not None:
                                     flag = False
                                     break
-                                """
-                                if maps[l] is not None or domain_knowledge.get(gen_string[l]) is not None:
-                                    continue
-                                if invalid_characters.get(gen_string[l]) is not None:
-                                    flag = False
-                                    break
-                                """
                             if flag is False:
                                 continue
                             else:
@@ -334,12 +354,17 @@ class NerdleHelper:
                                 if self.absurd_string_detection(_list=gen_string) is False:
                                     #print("YES")
                                     continue
+                                self.sort_mix_list(_list=dom_keys)
+                                print("dom_keys ",dom_keys, domain_knowledge_keys)
+                                if len(domain_knowledge_keys) > 0 and domain_knowledge_keys != dom_keys:
+                                    # can't properly apply domain knowledge
+                                    continue
                                 possibilities.append([])
                                 for l in range(0, len(gen_string)):
                                     possibilities[-1].append(gen_string[l])
         return possibilities
 
-    def get_information(self, input_string, maps, domain_knowledge, invalid_characters):
+    def get_information(self, input_string, maps, domain_knowledge, invalid_characters, last_used_domain_knowledge):
         # updating maps + domain knowledge
         for i in range(0, len(input_string), 2):
             if input_string[i] == 'X':
@@ -355,6 +380,7 @@ class NerdleHelper:
                     if domain_knowledge.get(char) is not None:
                         # jana knowledge ami komaye dilam
                         del domain_knowledge[char]
+                        del last_used_domain_knowledge[char]
                 elif validity == '0':
                     # a possible option
                     char = input_string[i]
@@ -362,12 +388,16 @@ class NerdleHelper:
                         char = int(char)
                     if domain_knowledge.get(char) is None:
                         domain_knowledge[char] = 1
+                    if last_used_domain_knowledge.get(char) is None:
+                        last_used_domain_knowledge[char] = []
+                    if int(floor(i / 2)) not in last_used_domain_knowledge[char]:
+                        last_used_domain_knowledge[char].append(int(floor(i / 2)))
                 elif validity == '2':
                     char = input_string[i]
                     if char >= '0' and char <= '9':
                         char = int(char)
                     invalid_characters[char] = 1
-        return domain_knowledge, maps, invalid_characters
+        return domain_knowledge, maps, invalid_characters, last_used_domain_knowledge
 
     def input_validation(self, input_string):
         if len(input_string) != 16:
@@ -390,9 +420,9 @@ class NerdleHelper:
                 return False
         return True
 
-    def nerdle_next_level_search(self, maps, domain_knowledge, invalid_characters):
+    def nerdle_next_level_search(self, maps, domain_knowledge, invalid_characters, last_used_domain_knowledge):
         possibles = []
-        possibles = self.string_generation(maps, domain_knowledge, invalid_characters)
+        possibles = self.string_generation(maps, domain_knowledge, invalid_characters, last_used_domain_knowledge)
         print(len(possibles))
         if len(possibles) > 0:
             idx = random.randint(0, len(possibles)-1)
@@ -405,6 +435,7 @@ class NerdleHelper:
         }
         invalid_characters = {}
         maps = [None, None, None, None, None, None, None, None]
+        last_used_domain_knowledge = {}
         try:
             while True:
                 print(
@@ -422,10 +453,10 @@ class NerdleHelper:
                 if self.input_validation(input_string) is False:
                     print("input error ")
                     continue
-                domain_knowledge, maps, invalid_characters = self.get_information(input_string, maps, domain_knowledge,
-                                                                                  invalid_characters)
-                print(domain_knowledge, maps, invalid_characters)
-                possibles = self.nerdle_next_level_search(maps, domain_knowledge, invalid_characters)
+                domain_knowledge, maps, invalid_characters, last_used_domain_knowledge = self.get_information(input_string, maps, domain_knowledge,
+                                                                                  invalid_characters, last_used_domain_knowledge)
+                print(domain_knowledge, maps, invalid_characters, last_used_domain_knowledge)
+                possibles = self.nerdle_next_level_search(maps, domain_knowledge, invalid_characters, last_used_domain_knowledge)
                 print(possibles)
         except Exception as e:
             print(e)
