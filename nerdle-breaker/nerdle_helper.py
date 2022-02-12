@@ -325,7 +325,6 @@ class NerdleHelper:
                             if keys.get(elm) is None:
                                 flag = False
                                 break
-                        print(keys, domain_knowledge, flag)
                         W.write("{} {} {} {}\n".format(keys, domain_knowledge, flag, invalid_characters))
                         if flag is True:
                             print(keys, list(domain_knowledge.keys()), domain_knowledge, flag)
@@ -335,18 +334,20 @@ class NerdleHelper:
                             applied_domain_knowledge = {}
                             dom_keys = []
                             for l in range(0, len(gen_string)):
+                                W.write("l = {}\n". format(l))
                                 if maps[l] is not None:
                                     continue
                                 if domain_knowledge.get(gen_string[l]) is not None:
                                     if applied_domain_knowledge.get(gen_string[l]) is None:
-                                        if last_used_domain_knowledge.get(gen_string[l]) is not None and l in last_used_domain_knowledge[gen_string[l]]:
+                                        if last_used_domain_knowledge.get(gen_string[l]) is not None and l not in last_used_domain_knowledge[gen_string[l]]:
+                                            applied_domain_knowledge[gen_string[l]] = l
+                                            dom_keys.append(gen_string[l])
                                             continue
-                                        applied_domain_knowledge[gen_string[l]] = l
-                                        dom_keys.append(gen_string[l])
-                                        continue
                                 if invalid_characters.get(gen_string[l]) is not None:
                                     flag = False
                                     break
+                                W.write("invalid flag {} {} {} {} {}\n".format(flag, domain_knowledge, invalid_characters, applied_domain_knowledge, last_used_domain_knowledge))
+                            print("invalid flag ", flag,  domain_knowledge, invalid_characters, applied_domain_knowledge, last_used_domain_knowledge)
                             if flag is False:
                                 continue
                             else:
@@ -380,7 +381,8 @@ class NerdleHelper:
                     if domain_knowledge.get(char) is not None:
                         # jana knowledge ami komaye dilam
                         del domain_knowledge[char]
-                        del last_used_domain_knowledge[char]
+                        if last_used_domain_knowledge.get(char) is not None:
+                            del last_used_domain_knowledge[char]
                 elif validity == '0':
                     # a possible option
                     char = input_string[i]
@@ -397,6 +399,24 @@ class NerdleHelper:
                     if char >= '0' and char <= '9':
                         char = int(char)
                     invalid_characters[char] = 1
+        # repeating characters' domain knowledge update
+        for i in range(0, len(input_string), 2):
+            if input_string[i] == 'X':
+                # No idea
+                continue
+            else:
+                validity = input_string[i+1]
+                if validity == '0':
+                    # a possible option
+                    char = input_string[i]
+                    if char >= '0' and char <= '9':
+                        char = int(char)
+                    if domain_knowledge.get(char) is None:
+                        domain_knowledge[char] = 1
+                    if last_used_domain_knowledge.get(char) is None:
+                        last_used_domain_knowledge[char] = []
+                    if int(floor(i / 2)) not in last_used_domain_knowledge[char]:
+                        last_used_domain_knowledge[char].append(int(floor(i / 2)))
         return domain_knowledge, maps, invalid_characters, last_used_domain_knowledge
 
     def input_validation(self, input_string):

@@ -130,6 +130,18 @@ def get_information(input_string, maps,  domain_knowledge, invalid_characters, l
                     last_used_domain_knowledge[input_string[i]].append(int(floor(i / 2)))
             elif input_string[i+1] == '2':
                 invalid_characters[input_string[i]] = True
+    # repeating characters' domain knowledge update
+    for i in range(0, len(input_string), 2):
+        print(input_string[i], "yes")
+        if input_string[i] == '0':
+            continue
+        else:
+            if input_string[i + 1] == '0':
+                domain_knowledge[input_string[i]] = 1
+                if last_used_domain_knowledge.get(input_string[i]) is None:
+                    last_used_domain_knowledge[input_string[i]] = []
+                if int(floor(i / 2)) not in last_used_domain_knowledge[input_string[i]]:
+                    last_used_domain_knowledge[input_string[i]].append(int(floor(i / 2)))
     return domain_knowledge, maps, invalid_characters, last_used_domain_knowledge
 
 
