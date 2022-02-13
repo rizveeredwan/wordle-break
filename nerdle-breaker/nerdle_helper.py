@@ -333,6 +333,7 @@ class NerdleHelper:
                             flag = True
                             applied_domain_knowledge = {}
                             dom_keys = []
+
                             for l in range(0, len(gen_string)):
                                 W.write("l = {}\n". format(l))
                                 if maps[l] is not None:
@@ -340,6 +341,10 @@ class NerdleHelper:
                                 if domain_knowledge.get(gen_string[l]) is not None:
                                     if applied_domain_knowledge.get(gen_string[l]) is None:
                                         if last_used_domain_knowledge.get(gen_string[l]) is not None and l not in last_used_domain_knowledge[gen_string[l]]:
+                                            applied_domain_knowledge[gen_string[l]] = l
+                                            dom_keys.append(gen_string[l])
+                                            continue
+                                        elif last_used_domain_knowledge.get(gen_string[l]) is None:
                                             applied_domain_knowledge[gen_string[l]] = l
                                             dom_keys.append(gen_string[l])
                                             continue
@@ -355,6 +360,7 @@ class NerdleHelper:
                                 if self.absurd_string_detection(_list=gen_string) is False:
                                     #print("YES")
                                     continue
+                                print("dom_keys ", dom_keys)
                                 self.sort_mix_list(_list=dom_keys)
                                 print("dom_keys ",dom_keys, domain_knowledge_keys)
                                 if len(domain_knowledge_keys) > 0 and domain_knowledge_keys != dom_keys:
