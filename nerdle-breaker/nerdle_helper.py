@@ -326,6 +326,7 @@ class NerdleHelper:
                                 flag = False
                                 break
                         W.write("{} {} {} {}\n".format(keys, domain_knowledge, flag, invalid_characters))
+                        print(keys, list(domain_knowledge.keys()), domain_knowledge, flag)
                         if flag is True:
                             print(keys, list(domain_knowledge.keys()), domain_knowledge, flag)
                             W.write("{} {} {} {}\n".format(keys, list(domain_knowledge.keys()), domain_knowledge, flag))
